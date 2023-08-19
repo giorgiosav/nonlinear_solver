@@ -44,16 +44,14 @@ namespace Solver {
             cout << "\trhs = " << rhs.transpose() << '\n';
         }
         for (int i = 0; i < max_iterations; ++i) {
-            VectorXd Fx = F(x);
+            VectorXd Fx = F(x) - rhs;
             if (verbose)
                 cout << "\tF(x) = " << Fx.transpose() << '\n';
             MatrixXd J = jacobian(x.size(), Fx.size(), F, x);
-            // cout << "J:\n = " << J << '\n';
             VectorXd delta_x = J.colPivHouseholderQr().solve(-Fx);
-
-            x += delta_x;
-            // double norm = delta_x.norm();
-            double norm = (Fx - rhs).norm();
+            
+            double norm = delta_x.norm();
+            // double norm = Fx.norm();
             
             if (verbose) {
                 cout << i << ": norm = " << norm << '\n';
@@ -70,6 +68,9 @@ namespace Solver {
                 }
                 return NRSolveStatus::CONVERGED;
             }
+
+            x += delta_x;
+
         }
         
         if (verbose) cout << "NR did not converge\n";

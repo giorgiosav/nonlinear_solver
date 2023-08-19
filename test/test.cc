@@ -3,6 +3,7 @@
 
 using Eigen::VectorXd;
 using Eigen::Matrix;
+using Eigen::Vector2d;
 
 using Vector5d = Matrix<double, 5, 1>;
 
@@ -38,14 +39,40 @@ Vector5d F(Vector5d const& x) {
     return y;
 }
 
+double f1_simple(double x1, double x2) {
+    return x1*x1 + x2*x2;
+}
+
+double f2_simple(double x1, double x2) {
+    return x1*x2 + x2*x2;
+}
+
+Vector2d F_simple(Vector2d const& x) {
+    Vector2d y;
+
+    y[0] = f1_simple(x(0), x(1));
+    y[1] = f2_simple(x(0), x(1));
+
+    return y;
+}
+
+void test_simple() {
+    Vector2d rhs;
+    rhs << 5, 6;
+
+    VectorXd x0 = Vector2d::Random();
+    Solver::NR_solve(F_simple, rhs, x0, 1e-6, 100, true);
+}
+
 void test_system1() {
     Vector5d rhs;
     rhs << 33, 15, 74, 14, 17;
 
-    VectorXd x0 = Vector5d::Random() * 5;
+    VectorXd x0 = Vector5d::Random();
     Solver::NR_solve(F, rhs, x0, 1e-6, 100, true);
 }
 
 int main() {
+    test_simple();
     test_system1();
 }
